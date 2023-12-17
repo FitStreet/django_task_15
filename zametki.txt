@@ -1,0 +1,181 @@
+from product.models import Company, Worker, Project, Address
+company_address = Address.objects.create(city = "Bishkek", street = "Manasa 62")
+company_address
+<Address: Address object (1)>
+company1 = Company.objects.create(name = 'IT pro', address = company_address)
+company1
+<Company: Company object (1)>
+worker1 = Worker.objects.create(name = 'Ivan', age = 31, company = company1)
+worker2 = Worker.objects.create(name = 'Igor', age = 20, company = company1)
+worker3 = Worker.objects.create(name = 'Elena', age = 25, company = company1)
+worker4 = Worker.objects.create(name = 'Alice', age = 40, company = company1)
+company1.address 
+<Address: Address object (1)>
+company1.workers.all()
+<QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (4)>]>
+project1 = Project.objects.create(title = 'New facebook 2.0')
+project1
+<Project: Project object (1)>
+project2 = Project.objects.create(title = 'New VK 2.0')
+project1.workers.add(worker1, worker2, worker3, worker4)
+project1.workers.all()
+<QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (4)>]>
+project2.workers.add(worker3, worker4)
+project2.workers.all()
+<QuerySet [<Worker: Worker object (3)>, <Worker: Worker object (4)>]>
+company1.workers.all()
+<QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (4)>]>
+worker3.projects.all()
+<QuerySet [<Project: Project object (1)>, <Project: Project object (2)>]>
+project1.workers.filter(age__gt = 30)
+<QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (4)>]>
+company1.workers.filter(name__contains = 'I')
+<QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>]>
+company1.workers.filter(name__contains = 'I', age__lt = 30)
+<QuerySet [<Worker: Worker object (2)>]>
+from django.db.models import Avg, Count, Sum, Min, Max, Q
+company1.workers.aggregate(Avg('age'))
+{'age__avg': 29.0}
+company1.workers.aggregate(Count('pk'))
+{'pk__count': 4}
+worker4.projects.aggregate(Count('pk'))
+{'pk__count': 2}
+company1.workers.aggregate(Sum('age'))
+{'age__sum': 116}
+project2.workers.aggregate(Min('age'))
+{'age__min': 25}
+project1.workers.aggregate(Max('age'))
+{'age__max': 40}
+company1.workers.filter(name__contains = 'I').aggregate(Sum('age'))
+{'age__sum': 51}
+company1.workers.filter(name__icontains = 'i')
+<QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>, <Worker: Worker object (4)>]>
+company1.workers.filter(name__istartswith = 'I')
+<QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>]>
+Worker.objects.filter(name = 'Ivan').update(name = 'Vanya')
+Worker.objects.get(name = 'Vanya')
+<Worker: Worker object (1)>
+worker4.delete()
+(3, {'product.Worker_projects': 2, 'product.Worker': 1})
+Worker.objects.all()
+<QuerySet [<Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (1)>]>
+project2.workers.all()
+<QuerySet [<Worker: Worker object (3)>]>
+project1.workers.all()
+<QuerySet [<Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (1)>]>
+
+
+# Импорт моделей(таблиц) и нужных функций
+from product.models import Company, Worker, Project, Address
+from django.db.models import Avg, Count, Sum, Min, Max, Q
+
+# Создание адреса для компании и компании
+company_address = Address.objects.create(city="Bishkek", street="Manasa 62")
+company1 = Company.objects.create(name='IT pro', address=company_address)
+
+company_address
+# <Address: Address object (1)>
+company1
+# <Company: Company object (1)>
+
+# Создание работников для компании
+worker1 = Worker.objects.create(name='Ivan', age=31, company=company1)
+worker2 = Worker.objects.create(name='Igor', age=20, company=company1)
+worker3 = Worker.objects.create(name='Elena', age=25, company=company1)
+worker4 = Worker.objects.create(name='Alice', age=40, company=company1)
+
+# Получение адреса компании и всех работников компании
+company1.address
+# <Address: Address object (1)>
+company1.workers.all()
+# <QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (4)>]>
+
+# Создание проектов
+project1 = Project.objects.create(title='New facebook 2.0')
+project2 = Project.objects.create(title='New VK 2.0')
+project1
+# <Project: Project object (1)>
+
+# Добавление работников к проектам
+project1.workers.add(worker1, worker2, worker3, worker4)
+project2.workers.add(worker3, worker4)
+
+# Получение всех работников для каждого проекта
+project1.workers.all()
+# <QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (4)>]>
+project2.workers.all()
+# <QuerySet [<Worker: Worker object (3)>, <Worker: Worker object (4)>]>
+
+# Получение всех проектов одного работника
+worker3.projects.all()
+#<QuerySet [<Project: Project object (1)>, <Project: Project object (2)>]>
+
+# Фильтрация работников в проекте по возрасту
+project1.workers.filter(age__gt=30)
+# <QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (4)>]>
+
+# Фильтрация работников компании по имени (по подстроке)
+company1.workers.filter(name__contains='I')
+# <QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>]>
+
+# Фильтрация работников компании по имени и возрасту
+company1.workers.filter(name__contains='I', age__lt=30)
+# <QuerySet [<Worker: Worker object (2)>]>
+
+# Агрегация по возрасту работников компании
+company1.workers.aggregate(Avg('age'))
+#{'age__avg': 29.0}
+
+# Подсчет соличества всех работников компании
+company1.workers.aggregate(Count('pk'))
+# {'pk__count': 4}
+
+# Агрегация по количеству проектов для работника
+worker4.projects.aggregate(Count('pk'))
+# {'pk__count': 2}
+
+# Сумма возростов всех работников компании
+company1.workers.aggregate(Sum('age'))
+# {'age__sum': 116}
+
+# Минимальный возраст работника проекта 2
+project2.workers.aggregate(Min('age'))
+# {'age__min': 25}
+
+# Максимальный возраст работника проекта 1
+project1.workers.aggregate(Max('age'))
+# {'age__max': 40}
+
+# Сумма возрастов работникой у которых в имени есть 'I'(чуствительно к регистру)
+company1.workers.filter(name__contains = 'I').aggregate(Sum('age'))
+#{'age__sum': 51}
+
+# Получаем всех работников в имени которых есть 'i'(не чуствительно к регистру)
+company1.workers.filter(name__icontains = 'i')
+# <QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>, <Worker: Worker object (4)>]>
+
+# Получаем всех работников имя которых начинается с 'I'
+company1.workers.filter(name__istartswith = 'I')
+# <QuerySet [<Worker: Worker object (1)>, <Worker: Worker object (2)>]>
+
+# Изменение имени работника
+Worker.objects.filter(name='Ivan').update(name='Vanya')
+
+# Получение работника по новому имени
+Worker.objects.get(name='Vanya')
+# <Worker: Worker object (1)>
+
+# Удаление работника из проекта
+worker4.delete()
+
+# Получение всех работников после удаления
+Worker.objects.all()
+# <QuerySet [<Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (1)>]>
+
+# Получение работников в проекте после удаления
+project2.workers.all()
+# <QuerySet [<Worker: Worker object (3)>]>
+
+# Получение работников в проекте после изменения имени
+project1.workers.all()
+# <QuerySet [<Worker: Worker object (2)>, <Worker: Worker object (3)>, <Worker: Worker object (1)>]>
