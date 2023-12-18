@@ -79,17 +79,17 @@ company1.workers.filter(name__contains='I')
 company1.workers.filter(name__contains='I', age__lt=30)
 <QuerySet [<Worker: Worker object (2)>]>
 ```
-### Агрегация по возрасту работников компании
+### Находим средний возраст работников компании
 ```python
 company1.workers.aggregate(Avg('age'))
 {'age__avg': 29.0}
 ```
-### Подсчет соличества всех работников компании
+### Подсчет количества всех работников компании
 ```python
 company1.workers.aggregate(Count('pk'))
 {'pk__count': 4}
 ```
-### Агрегация по количеству проектов для работника
+### Подсчет количества проектов для работника
 ```python
 worker4.projects.aggregate(Count('pk'))
 {'pk__count': 2}
